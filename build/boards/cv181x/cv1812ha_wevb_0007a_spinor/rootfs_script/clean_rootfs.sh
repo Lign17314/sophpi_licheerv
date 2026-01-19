@@ -1,0 +1,1 @@
+../../cv1811ha_wevb_0007a_spinor/rootfs_script/clean_rootfs.sh
