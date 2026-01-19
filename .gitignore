@@ -1,3 +1,8 @@
 *.o
 *.cmd
 /install
+/build/scripts/__pycache__
+/cvi_alios/scripts/defconfig/__pycache__
+/linux_5.10/Kconfiglib/__pycache__
+/cvi_mpi/modules/isp/common/toolJsonGenerator/pqtool_definition.json
+/cvi_mpi/modules/isp/cv181x/isp/inc/isp_version.h
