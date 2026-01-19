@@ -714,7 +714,7 @@ function build_all()
     build_osdrv || return $?
     build_3rd_party || return $?
     build_middleware || return $?
-    build_cvi_rtsp || return $?
+    # build_cvi_rtsp || return $?
     if [ "$TPU_REL" = 1 ]; then
       build_tpu_sdk || return $?
       build_ive_sdk || return $?

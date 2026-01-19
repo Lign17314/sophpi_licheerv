@@ -6,7 +6,7 @@ include $(PARAM_FILE)
 #
 .PHONY: clean all module sample install uninstall package 3rdparty self_test clean_all
 
-all: prepare 3rdparty module sample self_test
+all: prepare 3rdparty module
 
 module: prepare 3rdparty
 	@rm -f $(MW_LIB)/Target:*.txt

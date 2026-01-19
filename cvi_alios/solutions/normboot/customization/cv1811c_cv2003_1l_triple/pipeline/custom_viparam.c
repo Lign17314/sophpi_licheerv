@@ -38,22 +38,22 @@ PARAM_CLASSDEFINE(PARAM_SNS_CFG_S,SENSORCFG,CTX,Sensor)[] = {
 #else
     {
         .s32Framerate = 15,
-        .enSnsType = CVSENS_CV2003_1L_SLAVE_MIPI_2M_30FPS_10BIT,
+        .enSnsType = GCORE_GC4653_MIPI_4M_30FPS_10BIT,
         .MipiDev = 0,
-        .s32BusId = 2,
-        .s8I2cDev = 2,
-        .s32I2cAddr = 53,
-        .as16LaneId = {0, 2, -1, -1, -1},
-        .as8PNSwap = {1, 1, 0, 0, 0},
+        .s32BusId = 4,
+        .s8I2cDev = 4,
+        .s32I2cAddr = 0x29,
+        .as16LaneId = {4, 3, 2, -1, -1},
+        .as8PNSwap = {0, 0, 0, 0, 0},
         .bMclkEn = 1,
         .u8Mclk = RX_MAC_CLK_200M,
-        .u8MclkFreq = CAMPLL_FREQ_24M,
+        .u8MclkFreq = CAMPLL_FREQ_27M,
         .u8MclkCam = 1,
         .u8Orien = 0,
         .bHwSync = 0,
         .u32Rst_pol = 1,
-        .u32Rst_pin = 14,
-        .u32Rst_port_idx = 2,
+        .u32Rst_pin = 1,
+        .u32Rst_port_idx = 4,
         .u8Rotation = 0,
     },
     {
@@ -110,26 +110,6 @@ PARAM_CLASSDEFINE(PARAM_ISP_CFG_S,ISPCFG,CTX,ISP)[] = {
         },
         .s8ByPassNum = 5,
     },
-    {
-        .bMonoSet = {0},
-        .bUseSingleBin = 0,
-        .stPQBinDes[0] =
-        {
-            .pIspBinData = NULL,
-            .u32IspBinDataLen = 0,
-        },
-        .s8ByPassNum = 5,
-    },
-    {
-        .bMonoSet = {0},
-        .bUseSingleBin = 0,
-        .stPQBinDes[0] =
-        {
-            .pIspBinData = NULL,
-            .u32IspBinDataLen = 0,
-        },
-        .s8ByPassNum = 5,
-    },
 };
 
 PARAM_CLASSDEFINE(PARAM_CHN_CFG_S,CHNCFG,CTX,CHN)[] = {
@@ -145,46 +125,17 @@ PARAM_CLASSDEFINE(PARAM_CHN_CFG_S,CHNCFG,CTX,CHN)[] = {
         .enVideoFormat = VIDEO_FORMAT_LINEAR,
         .enCompressMode = COMPRESS_MODE_TILE,
     },
-    {
-        .s32ChnId = 1,
-        .enWDRMode = WDR_MODE_NONE,
-        .bYuvBypassPath = 0,
-        .f32Fps = -1,
-        .u32Width = 1920,
-        .u32Height = 1080,
-        .enPixFormat = PIXEL_FORMAT_NV21,
-        .enDynamicRange = DYNAMIC_RANGE_SDR8,
-        .enVideoFormat = VIDEO_FORMAT_LINEAR,
-        .enCompressMode = COMPRESS_MODE_TILE,
-    },
-    {
-        .s32ChnId = 2,
-        .enWDRMode = WDR_MODE_NONE,
-        .bYuvBypassPath = 0,
-        .f32Fps = -1,
-        .u32Width = 1920,
-        .u32Height = 1080,
-        .enPixFormat = PIXEL_FORMAT_NV21,
-        .enDynamicRange = DYNAMIC_RANGE_SDR8,
-        .enVideoFormat = VIDEO_FORMAT_LINEAR,
-        .enCompressMode = COMPRESS_MODE_TILE,
-    }
 };
 
 PARAM_CLASSDEFINE(PARAM_PIPE_CFG_S,PIPECFG,CTX,PIPE)[] = {
     {
         .pipe = {0, -1, -1, -1, -1, -1},
     },
-    {
-        .pipe = {3, -1, -1, -1, -1, -1},
-    },
-    {
-        .pipe = {1, -1, -1, -1, -1, -1},
-    }
 };
 
+
 PARAM_VI_CFG_S g_stViCtx = {
-    .u32WorkSnsCnt = 3,
+    .u32WorkSnsCnt = 1,
     .pstSensorCfg = PARAM_CLASS(SENSORCFG,CTX,Sensor),
     .pstPipeInfo = PARAM_CLASS(PIPECFG,CTX,PIPE),
     .pstIspCfg = PARAM_CLASS(ISPCFG,CTX,ISP),

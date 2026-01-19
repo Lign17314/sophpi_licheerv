@@ -16,8 +16,8 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
-#ifndef __CV180X__
-	#define __CV180X__
+#ifndef __CV181X__
+	#define __CV181X__
 #endif
 
 #define IS_CHIP_CV183X(x) (((x) == CVI1829) || ((x) == CVI1832) || ((x) == CVI1835) || ((x) == CVI1838))

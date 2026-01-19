@@ -249,7 +249,7 @@ PARAM_CLASSDEFINE(PARAM_ROI_PARAM_S,ROICFG,CTX,VENC)[] = {
 };
 
 PARAM_VENC_CFG_S  g_stVencCtx = {
-    .s32VencChnCnt = 4,
+    .s32VencChnCnt = 2,
     .pstVencChnCfg = PARAM_CLASS(VENCCFG,CTX,VENC),
     .s8RoiNumber = 0,
     .pstRoiParam = PARAM_CLASS(ROICFG,CTX,VENC),
