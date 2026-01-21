@@ -258,10 +258,13 @@ void rwnx_platform_off(struct rwnx_hw *rwnx_hw, void **config)
 
 #ifdef CONFIG_APP_FASYNC
 struct rwnx_aic_chardev chardev;
+int cdev_opened = 0;
 int rwnx_aic_cdev_open(struct inode *inode, struct file *filp)
 {
     filp->private_data = &chardev;
     printk("rwnx_aic_cdev_open\r\n");
+    cdev_opened = 1;
+    schedule_work(&chardev.fasync_work);
     return 0;
 }
 
@@ -274,12 +277,13 @@ void rwnx_aic_cdev_fasync_work(struct work_struct *work)
 {
     unsigned long flags;
     struct rwnx_fasync_info *fsy_info;
-
+    printk("rwnx_aic_cdev_fasync_work %d\r\n",__LINE__);
     while(1) {
 
         spin_lock_irqsave(&chardev.fasync_lock, flags);
         if (list_empty(&chardev.fasync_list)) {
             spin_unlock_irqrestore(&chardev.fasync_lock, flags);
+            printk("rwnx_aic_cdev_fasync_work break");
             break;
         }
         fsy_info = list_first_entry(&chardev.fasync_list, struct rwnx_fasync_info, list);
@@ -289,15 +293,16 @@ void rwnx_aic_cdev_fasync_work(struct work_struct *work)
         init_completion(&chardev.fasync_comp);
         memcpy(chardev.fasync_info->mem, fsy_info->mem, CDEV_BUF_MAX);
         if(chardev.async_queue) {
-            //printk("Send signal\n");
+            printk("Send signal\n");
             kill_fasync(&chardev.async_queue, SIGIO, POLL_IN);
         }
         kfree(fsy_info);
-
+        printk("rwnx_aic_cdev_fasync_work %d\r\n",__LINE__);
         if ((wait_for_completion_timeout(&chardev.fasync_comp, msecs_to_jiffies(PLATFORM_PREPARE_TIMEOUT)) == 0)) {
             printk("fasync: application confirm timeout\n");
         }
     }
+    printk("rwnx_aic_cdev_fasync_work %d\r\n",__LINE__);
 }
 
 int rwnx_aic_cdev_fill_mem(char *buff)
@@ -305,10 +310,10 @@ int rwnx_aic_cdev_fill_mem(char *buff)
     unsigned long flags;
     struct rwnx_fasync_info *fsy_info;
 
-    if (g_custom_msg_vnet.driver_insmod_ready == false) {
-        printk("netdrv insmod don`t finish!\n");
-        return -1;
-    }
+    // if (g_custom_msg_vnet.driver_insmod_ready == false) {
+    //     printk("netdrv insmod don`t finish!\n");
+    //     return -1;
+    // }
 
     fsy_info = kzalloc(sizeof(struct rwnx_fasync_info), GFP_KERNEL);
     if (!fsy_info) {
@@ -320,7 +325,7 @@ int rwnx_aic_cdev_fill_mem(char *buff)
     spin_lock_irqsave(&chardev.fasync_lock, flags);
     list_add_tail(&fsy_info->list, &chardev.fasync_list);
     spin_unlock_irqrestore(&chardev.fasync_lock, flags);
-
+    if(cdev_opened)
     schedule_work(&chardev.fasync_work);
 
     return 0;
@@ -371,24 +376,31 @@ static struct file_operations aic_cdev_driver_fops = {
     .release = rwnx_aic_cdev_release,
 };
 
+// 1. 固定设备号：和你的mknod命令完全一致（主240，次0）
+#define AIC_CDEV_MAJOR    240
 #define AIC_CDEV_MINOR    0
+
 int rwnx_aic_cdev_driver_init(void)
 {
     int ret = 0;
-    struct device *devices;
 
-    // alloc buff for fasync_info
+    // 1. 为fasync_info分配内存（原有逻辑保留）
     chardev.fasync_info = kzalloc(sizeof(struct rwnx_fasync_info), GFP_KERNEL);
     if (!chardev.fasync_info) {
         printk("%s fasync_info alloc fail\n", __func__);
         goto exit;
     }
 
-    if (alloc_chrdev_region(&chardev.dev, AIC_CDEV_MINOR, 1, "aic_cdev_ioctl")) {
-        printk("%s: alloc_chrdev_region failure\n", __FUNCTION__);
+    // 2. 静态注册固定设备号（替换原有的动态分配alloc_chrdev_region）
+    chardev.dev = MKDEV(AIC_CDEV_MAJOR, AIC_CDEV_MINOR); // 组合240:0
+    if (register_chrdev_region(chardev.dev, 1, "aic_cdev_ioctl")) {
+        printk("%s: register_chrdev_region failure (major=240, minor=0)\n", __FUNCTION__);
         goto free_fasync_info;
     }
-    chardev.major = MAJOR(chardev.dev);
+    chardev.major = AIC_CDEV_MAJOR; // 固定为240
+    // chardev.minor = AIC_CDEV_MINOR; // 固定为0
+    // 打印提示：明确对应你的mknod命令
+    printk("%s: register fixed dev num: 240:0, use 'mknod /dev/aic_mcdev c 240 0' to create node\n", __func__);
 
     // add cdev
     chardev.c_cdev = kzalloc(sizeof(struct cdev), GFP_KERNEL);
@@ -401,23 +413,7 @@ int rwnx_aic_cdev_driver_init(void)
     ret = cdev_add(chardev.c_cdev, chardev.dev, 1);
     if(ret < 0) {
         printk("%s: cdev_add failure\n", __FUNCTION__);
-        goto free_chrdev_region;
-    }
-
-    // create device_class
-    chardev.cdev_class = class_create(THIS_MODULE, "aic_cdev_class");
-    if(IS_ERR(chardev.cdev_class)) {
-        printk("%s: class_create failure\n", __FUNCTION__);
-        ret = PTR_ERR(chardev.cdev_class);
         goto free_cdev;
-    }
-
-    // create device
-    devices = device_create(chardev.cdev_class, NULL, MKDEV(chardev.major, AIC_CDEV_MINOR), NULL, "aic_cdev");
-    if(IS_ERR(devices)) {
-        printk("%s: device_create failure\n", __FUNCTION__);
-        ret = PTR_ERR(devices);
-        goto free_device_class;
     }
 
     printk("Create device: /dev/aic_cdev\n");
@@ -430,8 +426,6 @@ int rwnx_aic_cdev_driver_init(void)
     INIT_WORK(&chardev.fasync_work, rwnx_aic_cdev_fasync_work);
     return 0;
 
-free_device_class:
-    class_destroy(chardev.cdev_class);
 free_cdev:
     cdev_del(chardev.c_cdev);
     kfree(chardev.c_cdev);
@@ -449,22 +443,37 @@ void rwnx_aic_cdev_driver_deinit(void)
 {
     RWNX_DBG(RWNX_FN_ENTRY_STR);
 
+    // 1. 取消异步工作队列（原有逻辑保留）
     cancel_work_sync(&chardev.fasync_work);
 
+    // 2. 释放fasync_info内存（原有逻辑保留）
     if (chardev.fasync_info) {
         kfree(chardev.fasync_info);
         chardev.fasync_info = NULL;
     }
 
+    // 3. 释放字符设备相关资源（核心修改：移除device/class销毁逻辑）
     if(chardev.c_cdev) {
-        device_destroy(chardev.cdev_class, MKDEV(chardev.major,0));
-        class_destroy(chardev.cdev_class);
+        // ① 移除 device_destroy/class_destroy（初始化时没创建，无需销毁）
+        // 原错误代码：
+        // device_destroy(chardev.cdev_class, MKDEV(chardev.major,0));
+        // class_destroy(chardev.cdev_class);
 
+        // ② 保留cdev删除和内存释放（原有逻辑）
         cdev_del(chardev.c_cdev);
         kfree(chardev.c_cdev);
         chardev.c_cdev = NULL;
-        unregister_chrdev_region(chardev.dev, 1);
     }
+
+    // 4. 独立释放设备号（关键：无论cdev是否存在，都要释放，避免资源泄漏）
+    // 原代码中unregister_chrdev_region在if(chardev.c_cdev)内，可能漏释放
+    unregister_chrdev_region(chardev.dev, 1);
+
+    // 可选：清空设备号相关变量（规范操作）
+    chardev.major = 0;
+    chardev.dev = 0;
+
+    RWNX_DBG("aic cdev driver deinit success, manual rm /dev/aic_mcdev if needed\n");
 }
 #endif
 
@@ -503,12 +512,12 @@ int rwnx_platform_init(struct rwnx_plat *rwnx_plat, void **platform_data)
         if (rftest_enable == RFTEST_DISABEL)
         #endif
         {
-            #ifdef CONFIG_APP_FASYNC
-            if (rwnx_aic_cdev_driver_init()) {
-                printk("aic_cdev init fail.\n");
-                return -1;
-            }
-            #endif /* CONFIG_APP_FASYNC */
+            // #ifdef CONFIG_APP_FASYNC
+            // if (rwnx_aic_cdev_driver_init()) {
+            //     printk("aic_cdev init fail.\n");
+            //     return -1;
+            // }
+            // #endif /* CONFIG_APP_FASYNC */
 
             #ifndef CONFIG_FAST_INSMOD
             if(rwnx_platform_get_mac_addr() != 0)

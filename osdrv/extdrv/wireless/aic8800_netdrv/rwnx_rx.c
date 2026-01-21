@@ -210,7 +210,8 @@ void rwnx_rx_handle_msg(void *dev, struct ipc_e2a_msg *msg)
                 g_custom_msg_vnet.wlan_status = WLAN_DISCONNECT;
 
                 #ifdef CONFIG_APP_FASYNC
-                if (g_custom_msg_vnet.comp_sign_get_wlan_ready == true) {
+                // if (g_custom_msg_vnet.comp_sign_get_wlan_ready == true)
+                {
                     sprintf(sync_buff, "MSG: %x, DISCONNECT\r\n", CUST_CMD_GET_WLAN_STATUS_CFM);
                     rwnx_aic_cdev_fill_mem(sync_buff);
                 }
@@ -233,7 +234,8 @@ void rwnx_rx_handle_msg(void *dev, struct ipc_e2a_msg *msg)
                 }
 
                 #ifdef CONFIG_APP_FASYNC
-                if (g_custom_msg_vnet.comp_sign_get_wlan_ready == true) {
+                // if (g_custom_msg_vnet.comp_sign_get_wlan_ready == true) 
+                {
                     sprintf(sync_buff, "MSG: %x, ssid: %s, rssi: %d, ip: %x, gw: %x, mk: %x\r\n", CUST_CMD_GET_WLAN_STATUS_CFM, g_custom_msg_vnet.get_wlan_cfm.ussid,
                         g_custom_msg_vnet.get_wlan_cfm.rssi, g_custom_msg_vnet.get_wlan_cfm.ip, g_custom_msg_vnet.get_wlan_cfm.gw, g_custom_msg_vnet.get_wlan_cfm.mk);
                     rwnx_aic_cdev_fill_mem(sync_buff);

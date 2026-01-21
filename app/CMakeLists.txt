@@ -54,7 +54,7 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mabi=lp64d" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdata-sections" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-to-int-cast" )
-set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char -Wl,-gc-sections -lstdc++ -lm -lpthread" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char -Wl,-gc-sections -lm -lpthread" )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=c906fdv" )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=rv64imafdcv0p7xthead" )
@@ -63,11 +63,11 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char" )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections" )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdata-sections" )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC" )
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-gc-sections -lm -lpthread" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-gc-sections -lstdc++ -lm -lpthread" )
 
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" )
 set( CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "" )
 
 
 
-add_executable(test_uvc main.c)
+add_executable(app_demo main.c)

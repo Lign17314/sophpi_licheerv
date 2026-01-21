@@ -52,8 +52,8 @@
 #define SDIOCLK_FREE_RUNNING_BIT            (0x1ul << 6)
 #define SDIO_OTHER_INTERRUPT                (0x1ul << 7)
 
-#define SDIOWIFI_CLOCK_V2               20000000 // default 20MHz
-#define SDIOWIFI_CLOCK_V3               20000000 // default 20MHz
+#define SDIOWIFI_CLOCK_V2               30000000 // default 20MHz
+#define SDIOWIFI_CLOCK_V3               30000000 // default 20MHz
 #define SDIOWIFI_PHASE_V2               0        // 0: default, 2: 180°
 
 #define SDIOWIFI_PWR_CTRL_INTERVAL      30

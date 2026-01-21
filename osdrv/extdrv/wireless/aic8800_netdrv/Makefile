@@ -1,7 +1,7 @@
 RWNX_VERS_NUM := 6.5.2.7
 
 # MODULE
-CONFIG_AIC8800_WLAN_SUPPORT = m
+CONFIG_AIC8800_WLAN_SUPPORT = y
 MODULE_NAME = aic8800_netdrv
 
 # Platform support list
@@ -14,8 +14,8 @@ CONFIG_PLATFORM_INGENIC_T41 ?= n
 CONFIG_PLATFORM_FH8852v201L ?= n
 
 # Platform hardware interface
-CONFIG_USB_SUPPORT   = y
-CONFIG_SDIO_SUPPORT  = n
+CONFIG_USB_SUPPORT   = n
+CONFIG_SDIO_SUPPORT  = y
 CONFIG_SDIO_IPC_FC   = n
 
 # Driver mode support list
@@ -23,10 +23,10 @@ CONFIG_VNET_MODE    ?= y
 CONFIG_RAWDATA_MODE ?= n
 
 # Fast insmod mode
-CONFIG_FAST_INSMOD ?= n
+CONFIG_FAST_INSMOD ?= y
 
 # Msg Callback setting
-CONFIG_APP_FASYNC ?= n
+CONFIG_APP_FASYNC ?= y
 
 # Driver rx reorder
 CONFIG_RX_REORDER   ?= y

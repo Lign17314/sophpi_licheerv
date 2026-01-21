@@ -1189,6 +1189,14 @@ static int __init rwnx_mod_init(void)
     // init_completion(&hostif_register_done);
 
     aicsmac_driver_register();
+
+    #ifdef CONFIG_APP_FASYNC
+    extern int rwnx_aic_cdev_driver_init(void);
+    if (rwnx_aic_cdev_driver_init()) {
+        printk("aic_cdev init fail.\n");
+        return -1;
+    }
+    #endif /* CONFIG_APP_FASYNC */
     return 0;
 #ifdef AICWF_SDIO_SUPPORT
     if ((wait_for_completion_timeout(&hostif_register_done, msecs_to_jiffies(REGISTRATION_TIMEOUT)) == 0)) {
