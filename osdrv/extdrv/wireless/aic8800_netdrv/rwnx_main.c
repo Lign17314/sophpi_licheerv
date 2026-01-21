@@ -1176,7 +1176,8 @@ struct completion hostif_register_done;
 
 void aicwf_hostif_ready(void)
 {
-    complete(&hostif_register_done);
+    // complete(&hostif_register_done);
+    printk("aicwf_hostif_ready\n");
 }
 
 static int __init rwnx_mod_init(void)
@@ -1185,10 +1186,10 @@ static int __init rwnx_mod_init(void)
     rwnx_print_version();
     printk("RELEASE DATE:%s \r\n", RELEASE_DATE);
 
-    init_completion(&hostif_register_done);
+    // init_completion(&hostif_register_done);
 
     aicsmac_driver_register();
-
+    return 0;
 #ifdef AICWF_SDIO_SUPPORT
     if ((wait_for_completion_timeout(&hostif_register_done, msecs_to_jiffies(REGISTRATION_TIMEOUT)) == 0)) {
         printk("register_driver timeout or error\n");

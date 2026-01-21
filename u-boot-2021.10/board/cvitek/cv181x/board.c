@@ -191,7 +191,7 @@ static void cv181x_ephy_id_init(void)
 	mmio_write_32(0x03009804, 0x0000);
 }
 
-static void cv181x_ephy_led_pinmux(void)
+void cv181x_ephy_led_pinmux(void)
 {
 	// LED PAD MUX
 	mmio_write_32(0x030010e0, 0x05);
@@ -224,7 +224,7 @@ int board_init(void)
 
 #if defined(CONFIG_PHY_CVITEK) /* config cvitek cv181x eth internal phy on ASIC board */
 	cv181x_ephy_id_init();
-	cv181x_ephy_led_pinmux();
+	// cv181x_ephy_led_pinmux();
 #endif
 
 #if defined(CONFIG_NAND_SUPPORT)

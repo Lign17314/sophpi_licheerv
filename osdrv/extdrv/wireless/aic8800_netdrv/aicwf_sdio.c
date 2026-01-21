@@ -1699,7 +1699,7 @@ int aicwf_sdio_func_init(struct aic_sdio_dev *sdiodev)
 
 int aicwf_sdiov3_func_init(struct aic_sdio_dev *sdiodev)
 {
-    //u8 val = 0;
+    u8 val = 0;
     int ret = 0;
     u8 val1 = 0;
     u8 retry_cnt = 0;
@@ -1738,7 +1738,7 @@ retry:
         sdio_release_host(sdiodev->func);
         return ret;
     }
-    #if 0
+    #if 1
     if (host->ios.timing == MMC_TIMING_UHS_DDR50) {
         val = 0x21;//0x1D;//0x5;
     } else {

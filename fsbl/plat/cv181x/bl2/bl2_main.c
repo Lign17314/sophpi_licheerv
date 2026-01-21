@@ -216,7 +216,7 @@ void bl2_main(void)
 
 #ifdef CONFIG_SKIP_UBOOT
 	cv181x_ephy_id_init();
-	cv181x_ephy_led_pinmux();
+	// cv181x_ephy_led_pinmux();
 #endif
 
 	setup_dl_flag();

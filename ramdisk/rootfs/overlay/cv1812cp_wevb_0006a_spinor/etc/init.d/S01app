@@ -1,0 +1,3 @@
+lineno=$((LINENO + 1))
+cat /proc/uptime | awk -v lineno="$lineno" '{print "script " lineno " line：" $1 " sec"}'
+echo "hello world"
